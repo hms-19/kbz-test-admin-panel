@@ -20,6 +20,7 @@ import { getCategories, setCategories } from 'src/features/categories/categories
 import { fetchCategories } from 'src/endpoints/categories'
 import { getTags, setTags } from 'src/features/tags/tagsSlice'
 import { fetchTags } from 'src/endpoints/tags'
+import { convertImageUrlToBase64 } from 'src/utils/file'
 
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileValidateSize,FilePondPluginFileEncode)
@@ -215,13 +216,18 @@ const BlogManage = () => {
         description : details.description,
         author : details.author,
         read_time: details.read_time,
-        category_id: details.category.id,
+        category_id: details.category.category_id,
         tags: details.tags
       })
 
+      let base64Image = convertImageUrlToBase64(details.image)
+      console.log(base64Image)
+      // console.log(details.image)
+      // console.log(base64Image)
+
       setImage(details.image)
       setAvatar(details.avatar)
-      setSelectedTags(details.tags.map(tag => tag.id));
+      setSelectedTags(details.tags.map(tag => tag.tag_id));
     }
   },[details])
 
@@ -289,8 +295,8 @@ const BlogManage = () => {
                     >
                         {
                             categories.length > 0 ?
-                            categories.map(category => (
-                                <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
+                            categories.map((category,index) => (
+                                <MenuItem key={index} value={category.id}>{category.name}</MenuItem>
                             ))
                             : <MenuItem value=''></MenuItem>
                         }
@@ -352,37 +358,40 @@ const BlogManage = () => {
                   </Grid> 
                 </Grid>
 
-                <Grid item xs={12} md={6}>
-                    <FormControl sx={{ m: 1, width: 300 }}>
-                        <InputLabel id="tag-id-label">Select Tags</InputLabel>
-                        <Select
-                            multiple
-                            value={selectedTags}
-                            onChange={handleTagChange}
-                            labelId="tag-id-label"
-                            id="tag-id"
-                            input={<OutlinedInput id="tags-chip" label="Tags" />}
-                            renderValue={(selected) => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {selected.map((tagId) => (
-                                <Chip key={tagId} label={tags?.find(e => e.id === tagId).name} />
-                                ))}
-                            </Box>
-                            )}
-                            MenuProps={MenuProps}
-                        >
-                            {
-                                
-                               tags.map((tag) => (
-                                <MenuItem key={tag.id} value={tag.id}>
-                                    <Checkbox checked={selectedTags.includes(tag.id)} />
-                                    <ListItemText primary={tag.name} />
-                                </MenuItem>
-                                ))
-                            }                      
-                        </Select>
-                    </FormControl>
-                </Grid>
+                {
+                  tags.length > 0 ?
+                    <Grid item xs={12} md={6}>
+                      <FormControl sx={{ m: 1, width: 300 }}>
+                          <InputLabel id="tag-id-label">Select Tags</InputLabel>
+                          <Select
+                              multiple
+                              value={selectedTags}
+                              onChange={handleTagChange}
+                              labelId="tag-id-label"
+                              id="tag-id"
+                              input={<OutlinedInput id="tags-chip" label="Tags" />}
+                              renderValue={(selected) => (
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                  {selected.map((tagId, index) => (
+                                  <Chip key={index} label={tags?.find(e => e.id === tagId).name} />
+                                  ))}
+                              </Box>
+                              )}
+                              MenuProps={MenuProps}
+                          >
+                              {
+                                  
+                                tags.map((tag) => (
+                                  <MenuItem key={tag.id} value={tag.id}>
+                                      <Checkbox checked={selectedTags.includes(tag.id)} />
+                                      <ListItemText primary={tag.name} />
+                                  </MenuItem>
+                                  ))
+                              }                      
+                          </Select>
+                      </FormControl>
+                    </Grid> : <></>
+                }
 
                 <Grid item xs={12} md={12}>
                   <TextField 
