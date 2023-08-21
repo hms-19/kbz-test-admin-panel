@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, CardHeader, Checkbox, Chip, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, TextField } from '@mui/material'
+import { Box, Button, Card, CardContent, CardHeader, Checkbox, Chip, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, TextField, Typography } from '@mui/material'
 import { Container } from '@mui/system'
 import React, { useEffect, useState } from 'react'
 import { FilePond, registerPlugin } from 'react-filepond'
@@ -66,8 +66,6 @@ const BlogManage = () => {
 
   const [image, setImage] = useState('')
   const [avatar, setAvatar] = useState('')
-
-
 
   const EnterTextField = (key, value) => {
     setData({...data, [key]: value})
@@ -209,7 +207,7 @@ const BlogManage = () => {
   } 
   }
   
-  useEffect(() => {
+  const fillData = async () => {
     if(isEdit){
       setData({
         title : details.title,
@@ -217,18 +215,19 @@ const BlogManage = () => {
         author : details.author,
         read_time: details.read_time,
         category_id: details.category.category_id,
-        tags: details.tags
+        tags: details.tags,
+        image: details.image,
+        avatar: details.avatar
       })
 
-      let base64Image = convertImageUrlToBase64(details.image)
-      console.log(base64Image)
-      // console.log(details.image)
-      // console.log(base64Image)
-
-      setImage(details.image)
+      setImage(details.avatar)
       setAvatar(details.avatar)
       setSelectedTags(details.tags.map(tag => tag.tag_id));
     }
+  }
+
+  useEffect(() => {
+    fillData()
   },[details])
 
   useEffect(() => {
@@ -268,6 +267,7 @@ const BlogManage = () => {
                         allowFileEncode={true}
                         allowFileSizeValidation={true}
                         maxFileSize='20MB'
+                        allowImageEdit={true}
                         imagePreviewMarkupShow={isPreview}
                         name="image" 
                         oninit={() => {
@@ -278,7 +278,14 @@ const BlogManage = () => {
                         }}
                         labelIdle='Drag & Drop your image or <span class="filepond--label-action">Browse Image</span>'                  
                       />
+                      {
+                        isEdit ?
+                        <Typography sx={{ color: "red" }}>
+                          You have to select image again , because of SSL Image Url error
+                      </Typography> : <></>
+                      }
                     </Grid>
+                
                   </Grid> 
                 </Grid>
 
@@ -354,6 +361,12 @@ const BlogManage = () => {
                         }}
                         labelIdle='Drag & Drop your image or <span class="filepond--label-action">Browse Avatar</span>'                  
                       />
+                      {
+                        isEdit ?
+                        <Typography sx={{ color: "red" }}>
+                          You have to select image again , because of SSL Image Url error
+                      </Typography> : <></>
+                      }
                     </Grid>
                   </Grid> 
                 </Grid>
